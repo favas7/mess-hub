@@ -5,7 +5,7 @@ import 'package:messhub/color/color.dart';
 import 'package:messhub/functions/popAlert.dart';
 import 'package:messhub/functions/profileTextBox.dart';
 import 'package:messhub/presentation/User/user_profile/user_profile_edit.dart';
-
+String loggedInuseremail='';
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -52,6 +52,7 @@ class _ProfileState extends State<Profile> {
     _loadUserData((data) {
       setState(() {
         userData = data;
+        loggedInuseremail=data['email'].toString();
       });
     });
   }

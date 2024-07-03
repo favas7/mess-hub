@@ -33,8 +33,8 @@ class _AdminHomeState extends State<AdminHome> {
           children: [
             const Spacer(),
             IconButton(onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>const MessDetailsAdd()));
-                            }, icon: const Icon(Icons.add),
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>const MessDetailsAdd()));
+            }, icon: const Icon(Icons.add),
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(mainColor),
               iconSize: WidgetStateProperty.all(40)

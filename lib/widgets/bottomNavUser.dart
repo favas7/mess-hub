@@ -6,7 +6,7 @@ import 'package:messhub/color/color.dart';
 import 'package:messhub/functions/user_details.dart';
 import 'package:messhub/presentation/User/user_home/home.dart';
 import 'package:messhub/presentation/User/user_profile/profile.dart';
-import 'package:messhub/presentation/User/user_data/userData.dart';
+import 'package:messhub/presentation/User/user_data/user_data.dart';
 Map<String, dynamic>?userdetails = {};
 class BottomNavUser extends StatefulWidget {
   const BottomNavUser({Key? key}) : super(key: key);

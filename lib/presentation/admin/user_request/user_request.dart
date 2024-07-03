@@ -81,13 +81,13 @@ class _UserRequestState extends State<UserRequest> {
                   var subscriptionDoc = subscription[index];
                   var subscriptionData = subscriptionDoc.data() as Map<String, dynamic>;
                   return ListTile(
-                    title: Text(subscriptionData['messname']),
+                    title: Text('${subscriptionData['username']}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('Email: ${subscriptionData['useremail']}'), 
                         Text('Phone: ${subscriptionData['phone']}'),
-                        Text('Username: ${subscriptionData['username']}'),
+                        
                       ],
                     ),
                     trailing: SizedBox(

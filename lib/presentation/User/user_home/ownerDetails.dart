@@ -52,6 +52,8 @@ class _OwnerDetailsState extends State<OwnerDetails> {
                   'username':userdetails?['name'],
                   'useremail': FirebaseAuth.instance.currentUser?.email ?? 'Unknown',
                   'phone': userdetails?['phone'],
+                  'adminphone': widget.data['contact'], 
+                  'date':DateTime.now().toString(),
                 }; 
                 saveSubscriptionToFirebase(sub);
               },
