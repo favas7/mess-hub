@@ -57,7 +57,7 @@ class _UserRequestState extends State<UserRequest> {
     try {
       await FirebaseFirestore.instance.collection('subscribe').doc(subscription.id).delete();
       showSuccessMessage(context, 'Subscription declined', duration: 2);
-      fetchSubscriptions(); 
+      fetchSubscriptions();
     } catch (e) {
       showSuccessMessage(context, 'Failed to decline subscription', duration: 2);
     }
@@ -71,50 +71,56 @@ class _UserRequestState extends State<UserRequest> {
         backgroundColor: mainColor,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              ListView.separated(
-                shrinkWrap: true,
-                itemCount: subscription.length,
-                itemBuilder: (context, index) {
-                  var subscriptionDoc = subscription[index];
-                  var subscriptionData = subscriptionDoc.data() as Map<String, dynamic>;
-                  return ListTile(
-                    title: Text('${subscriptionData['username']}'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Email: ${subscriptionData['useremail']}'), 
-                        Text('Phone: ${subscriptionData['phone']}'),
-                        
-                      ],
-                    ),
-                    trailing: SizedBox(
-                      width: 100,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () => declineSubscription(subscriptionDoc),
-                            icon: const Icon(Icons.cancel),
+        child: subscription.isEmpty
+            ? const Center(
+                child: Text(
+                  'No requests found',
+                  style: TextStyle(fontSize: 20, color: Colors.grey),
+                ),
+              )
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: subscription.length,
+                      itemBuilder: (context, index) {
+                        var subscriptionDoc = subscription[index];
+                        var subscriptionData = subscriptionDoc.data() as Map<String, dynamic>;
+                        return ListTile(
+                          title: Text('${subscriptionData['username']}'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Email: ${subscriptionData['useremail']}'),
+                              Text('Phone: ${subscriptionData['phone']}'),
+                            ],
                           ),
-                          IconButton(
-                            onPressed: () => acceptSubscription(subscriptionDoc),
-                            icon: const Icon(Icons.check_box_rounded),
+                          trailing: SizedBox(
+                            width: 100,
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () => declineSubscription(subscriptionDoc),
+                                  icon: const Icon(Icons.cancel),
+                                ),
+                                IconButton(
+                                  onPressed: () => acceptSubscription(subscriptionDoc),
+                                  icon: const Icon(Icons.check_box_rounded),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(
+                        color: Colors.grey,
+                        thickness: 1,
                       ),
                     ),
-                  );
-                },
-                separatorBuilder: (context, index) => const Divider(
-                  color: Colors.grey,
-                  thickness: 1,
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }

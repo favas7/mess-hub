@@ -15,15 +15,9 @@ class AdminHome extends StatefulWidget {
   State<AdminHome> createState() => _AdminHomeState();
 }
 
-
 class _AdminHomeState extends State<AdminHome> {
   User? user = FirebaseAuth.instance.currentUser;
   late String? email = user?.email;
-
-  // Keeping track of the favorite status
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -32,32 +26,35 @@ class _AdminHomeState extends State<AdminHome> {
         title: Row(
           children: [
             const Spacer(),
-            IconButton(onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>const MessDetailsAdd()));
-            }, icon: const Icon(Icons.add),
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(mainColor),
-              iconSize: WidgetStateProperty.all(40)
-            ),)
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MessDetailsAdd()),
+                );
+              },
+              icon: const Icon(Icons.add),
+            ),
           ],
         ),
-      ), 
+        backgroundColor: mainColor,
+      ),
       backgroundColor: adminBg,
       body: StreamBuilder<QuerySnapshot>(
-  stream: FirebaseFirestore.instance
-      .collection("messdetails")
-      .where("email", isEqualTo: email)
-      .snapshots(),
-  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    } else if (snapshot.hasError) {
-      return Center(child: Text('Error: ${snapshot.error}'));
-    } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-      return const Center(child: Text('No Data Found'));
-    } else {
-      List<QueryDocumentSnapshot> messDetails = snapshot.data!.docs;
-      return ListView.builder(
+        stream: FirebaseFirestore.instance
+            .collection("messdetails")
+            .where("email", isEqualTo: email)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No Data Found'));
+          } else {
+            List<QueryDocumentSnapshot> messDetails = snapshot.data!.docs;
+            return ListView.builder(
               itemCount: messDetails.length,
               itemBuilder: (BuildContext context, int index) {
                 var detail = messDetails[index];
@@ -76,7 +73,6 @@ class _AdminHomeState extends State<AdminHome> {
                   'fullplanveg': detail.get('FullPlanVeg') ?? '',
                   'twotimemealveg': detail.get('TwoTimeMealVeg') ?? '',
                   'lunchonlyveg': detail.get('LunchOnlyVeg') ?? '',
-
                 };
 
                 return Padding(
@@ -143,9 +139,27 @@ class _AdminHomeState extends State<AdminHome> {
                                 const SizedBox(width: 20),
                                 IconButton(
                                   onPressed: () {},
-                                  icon: const Icon(Icons.star, color: Colors.yellow),
+                                  icon: const Icon(Icons.supervised_user_circle_sharp),
                                 ),
-                                const Text('3.4'),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('subscribed')
+                                      .where('adminemail', isEqualTo: email)
+                                      .snapshots(),
+                                  builder: (context, customerSnapshot) {
+                                    if (customerSnapshot.connectionState == ConnectionState.waiting) {
+                                      return const CircularProgressIndicator();
+                                    }
+                                    if (customerSnapshot.hasError) {
+                                      return Text('Error: ${customerSnapshot.error}');
+                                    }
+                                    if (!customerSnapshot.hasData || customerSnapshot.data!.docs.isEmpty) {
+                                      return const Text('0');
+                                    }
+                                    var customerCount = customerSnapshot.data!.docs.length;
+                                    return Text('$customerCount');
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -156,7 +170,6 @@ class _AdminHomeState extends State<AdminHome> {
                               'Description about the mess in detail to understand \n customer.Description about the mess in detail to \n understand',
                             ),
                           ),
-                          
                         ],
                       ),
                     ),
@@ -184,7 +197,7 @@ class _AdminHomeState extends State<AdminHome> {
                 : null,
           ),
         );
-      },
+      }, 
       errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
         return const Center(child: Icon(Icons.error));
       },

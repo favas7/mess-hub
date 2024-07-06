@@ -54,6 +54,7 @@ class _CustomerListState extends State<CustomerList> {
                     children: [
                       Text('Email: ${data['useremail'] ?? 'No email'}'),
                       Text('Phone: ${data['phone'] ?? 'No phone'}'),
+                      Text('Join Date: ${data['date']??'no Info'} ')
                     ],
                   ),
                 );

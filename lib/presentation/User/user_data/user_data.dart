@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:messhub/functions/heading.dart';
 import 'package:messhub/functions/textbox.dart';
 import 'package:messhub/presentation/User/user_data/monthly_counter.dart';
-import 'package:messhub/presentation/logIn/logIn.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:messhub/color/color.dart';
@@ -86,15 +85,7 @@ class _UserDataState extends State<UserData> {
     }
   }
 
-  void logout() async {
-    await FirebaseAuth.instance.signOut();
-    setState(() {
-      userdetails = null;
-      messName = null;
-    });
-    // ignore: use_build_context_synchronously
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-  }
+
 
   @override
   Widget build(BuildContext context) {

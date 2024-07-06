@@ -138,9 +138,27 @@ class _HomeState extends State<Home> {
                                 const SizedBox(width: 20),
                                 IconButton(
                                   onPressed: () {},
-                                  icon: const Icon(Icons.star, color: Colors.yellow),
+                                  icon: const Icon(Icons.supervised_user_circle_sharp),
                                 ),
-                                const Text('3.4'),
+                                StreamBuilder<QuerySnapshot>(
+                                  stream: FirebaseFirestore.instance
+                                      .collection('subscribed')
+                                      .where('adminemail', isEqualTo: details['email']) 
+                                      .snapshots(),
+                                  builder: (context, customerSnapshot) {
+                                    if (customerSnapshot.connectionState == ConnectionState.waiting) {
+                                      return const CircularProgressIndicator();
+                                    }
+                                    if (customerSnapshot.hasError) {
+                                      return Text('Error: ${customerSnapshot.error}');
+                                    }
+                                    if (!customerSnapshot.hasData || customerSnapshot.data!.docs.isEmpty) {
+                                      return const Text('0');
+                                    }
+                                    var customerCount = customerSnapshot.data!.docs.length;
+                                    return Text('$customerCount');
+                                  },
+                                ),
                               ],
                             ),
                           ),
