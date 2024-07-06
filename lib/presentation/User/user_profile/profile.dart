@@ -5,7 +5,9 @@ import 'package:messhub/color/color.dart';
 import 'package:messhub/functions/popAlert.dart';
 import 'package:messhub/functions/profileTextBox.dart';
 import 'package:messhub/presentation/User/user_profile/user_profile_edit.dart';
-String loggedInuseremail='';
+
+String loggedInUserEmail = '';
+
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -17,24 +19,32 @@ Future<void> _loadUserData(Function(Map<String, String>) updateUser) async {
   User? user = FirebaseAuth.instance.currentUser;
 
   if (user != null) {
-    DocumentSnapshot userData = await FirebaseFirestore.instance
-        .collection('userDetails')
-        .doc(user.email)
-        .get();
+    try {
+      DocumentSnapshot userData = await FirebaseFirestore.instance
+          .collection('userDetails')
+          .doc(user.email)
+          .get();
 
-    String userName = userData['name'] ?? '';
-    String email = userData['email'] ?? '';
-    String phone = userData['phone'] ?? '';
-    String profileImage = userData['profileImage'] ?? '';
+      if (userData.exists) {
+        var data = userData.data() as Map<String, dynamic>;
+        String userName = data.containsKey('name') ? data['name'] : '';
+        String email = data.containsKey('email') ? data['email'] : '';
+        String phone = data.containsKey('phone') ? data['phone'] : '';
+        String profileImage = data.containsKey('profileImage') ? data['profileImage'] : '';
 
 
-
-    updateUser({
-      'name': userName,
-      'email': email,
-      'phone': phone,
-      'profileImage': profileImage,
-    });
+        updateUser({
+          'name': userName,
+          'email': email,
+          'phone': phone,
+          'profileImage': profileImage,
+        });
+      } else {
+      }
+    // ignore: empty_catches
+    } catch (e) {
+    }
+  } else {
   }
 }
 
@@ -50,10 +60,12 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     _loadUserData((data) {
-      setState(() {
-        userData = data;
-        loggedInuseremail=data['email'].toString();
-      });
+      if (mounted) {
+        setState(() {
+          userData = data;
+          loggedInUserEmail = data['email'] ?? '';
+        });
+      }
     });
   }
 

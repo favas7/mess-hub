@@ -1,9 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class MonthlyCounter extends StatefulWidget {
   final DateTime date;
   final DateTime year;
-  const MonthlyCounter({super.key, required this.date, required this.year});
+  final Map<String, dynamic> userdetails;
+
+  const MonthlyCounter({
+    super.key,
+    required this.date,
+    required this.year,
+    required this.userdetails,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -12,45 +20,79 @@ class MonthlyCounter extends StatefulWidget {
 
 class _MonthlyCounterState extends State<MonthlyCounter> {
   int _daysElapsed = 0;
-  int _totalDaysInMonth = 0;
+  int _remainingDays = 0;
+  int totalDaysInMonth = 30; // Assuming the month has 30 days
 
   @override
   void initState() {
     super.initState();
-    _calculateDays();
+    _fetchSubscriptionDate();
   }
 
-  void _calculateDays() {
+  Future<void> _fetchSubscriptionDate() async {
+    try {
+      var querySnapshot = await FirebaseFirestore.instance
+          .collection('subscribed')
+          .where('useremail', isEqualTo: widget.userdetails['email'])
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        var data = querySnapshot.docs.first.data();
+        var subscriptionDate = _getDateFromData(data['date']);
+        _calculateDays(subscriptionDate);
+      } else {
+      }
+    // ignore: empty_catches
+    } catch (e) {
+    }
+  }
+
+  DateTime _getDateFromData(dynamic date) {
+    if (date is Timestamp) {
+      return date.toDate();
+    } else if (date is String) {
+      return DateTime.parse(date);
+    } else {
+      throw Exception('Invalid date format');
+    }
+  }
+
+  void _calculateDays(DateTime subscribedDate) {
     DateTime now = DateTime.now();
-    DateTime firstDayOfMonth = widget.date;
-    DateTime lastDayOfMonth = DateTime(now.year, now.month + 1, 0);
 
     setState(() {
-      _daysElapsed = now.difference(firstDayOfMonth).inDays + 1;
-      _totalDaysInMonth = lastDayOfMonth.day;
+      _daysElapsed = now.difference(subscribedDate).inDays + 1;
+      _remainingDays = totalDaysInMonth - _daysElapsed;
+      if (_remainingDays < 0) {
+        _remainingDays = 0; // Ensure the remaining days don't go negative
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Monthly Counter'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Days elapsed this month:',
-              style: TextStyle(fontSize: 20),
-            ),
-            Text(
-              '$_daysElapsed / $_totalDaysInMonth',
-              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          const Text(
+            'Days elapsed since subscribed:',
+            style: TextStyle(fontSize: 20),
+          ),
+          Text(
+            '$_daysElapsed',
+            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Remaining days in month:',
+            style: TextStyle(fontSize: 20),
+          ),
+          Text(
+            '$_remainingDays',
+            style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
